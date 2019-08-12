@@ -41,3 +41,19 @@ def dinner(request):
         'google_link': 'https://www.google.com'
     }
     return render(request, 'dinner.html', context)
+
+def cube(request, num):
+    context = {
+        'num': num,
+        '3num': num**3,
+        'numbers': [1,2,3],
+        'students': {'a': 'a', 'b': 'b'}
+        }
+    return render(request, 'cube.html', context)
+
+def about(request, name, age):  # urls에 정의한 주소값의 변수명과 같은 변수명을 사용해야 한다.
+    context = {
+        'name': name,
+        'age': age
+    }
+    return render(request, 'about.html', context)
