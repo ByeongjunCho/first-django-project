@@ -28,4 +28,5 @@ urlpatterns = [
     # url의 특정 값을 변수처럼 활용
     path('hello/<str:name>/', views.hello),
     path('lotto/', views.lotto),  
+    path('dinner/', views.dinner),
 ]
