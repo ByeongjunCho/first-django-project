@@ -74,11 +74,11 @@ $ pip install django
 
 ```bash
 $ mkdir __프로젝트 이름/폴더 이름__
-$ ck __프로젝트 이름/폴더 이름__
+$ cd __프로젝트 이름/폴더 이름__
 ```
 
 ```bash
-$ django-admin startproject __프로젝트이름__
+$ django-admin startproject __프로젝트이름__ .
 ```
 
 * 프로젝트 이름으로 구성된 폴더와 `manage.py`가 생성된다.
@@ -184,7 +184,7 @@ $ python manage.py runserver
 
 
 
-## 흐름도
+## 3. 예제
 
 ```python
 # urls.py 
@@ -202,11 +202,130 @@ urlpatterns = [
     path('', views.index),
     # variable routing
     # url의 특정 값을 변수처럼 활용
-    path('hello/<str:name>/', views.hello),
+    path('hello/<str:name>/', views.hello),  
     path('lotto/', views.lotto),  
     path('dinner/', views.dinner), 
     path('cube/<int:num>/', views.cube),
-    path('about/<str:name>/<int:age>/', views.about)
+    path('about/<str:name>/<int:age>/', views.about) # 주소에 입력되는 값을 받는 방법
 ]
+```
+
+```python
+# app 이름__ views.py
+import random
+import datetime
+from django.shortcuts import render
+
+# Create your views here.
+
+# 2. 요청을 처리할 함수 정의
+
+def index(request):
+    # 2. >> 로직 작성 <<
+    # 3. 해당하는 템플릿 반환
+    return render(request, 'index.html')
+
+def hello(request, name):
+    context = {'name':name}
+    return render(request, 'hello.html', context)
+
+def lotto(request):
+    print(request)  # 요청 정보가 들어온다.
+    print(type(request))
+    print(request.META)
+    # 로직
+    numbers = sorted(random.sample(range(1, 46), 6))
+    # 값을 딕셔너리에 담아서(보통 context라고 부름)
+    context = {'numbers': numbers}
+    # render 할때 3번째 인자로 넘겨준다
+    # render 함수의 필수 인자 : request, template 파일
+    # 변수를 넘겨주고 싶으면 3번째 인자로 dictionary를 넘겨 준다.
+    # Django에서 활용하는 템플릿 언어는 Django Template Language(DTL)이다.
+    return render(request, 'lotto.html', context)
+
+def dinner(request):
+    menus = ['롯데리아', '편의점도시락', '맘스터치', '응급실떡볶이', '노은각', '피자', '치킨']
+    pick = random.choice(menus)
+    context = {
+        'pick': pick, 
+        'menus': menus, 
+        'users': [],
+        'sentence': 'Life is short, You need Python + django!',
+        'datetime_now': datetime.datetime.now(),
+        'google_link': 'https://www.google.com'
+    }
+    return render(request, 'dinner.html', context)
+
+def cube(request, num):
+    context = {
+        'num': num,
+        '3num': num**3,
+        'numbers': [1,2,3],
+        'students': {'a': 'a', 'b': 'b'}
+        }
+    return render(request, 'cube.html', context)
+
+def about(request, name, age):  # urls에 정의한 주소값의 변수명과 같은 변수명을 사용해야 한다.
+    context = {
+        'name': name,
+        'age': age
+    }
+    return render(request, 'about.html', context)
+```
+
+다음과 같이 html + Django에서 사용 가능한 html 특수언어가 존재한다.
+
+```html
+<!--....... -->
+<body>
+  <!-- 1. 출력 -->
+  <h1>오늘 저녁은 {{pick}}먹어!</h1>
+  <h2>1. 반복문</h2>
+  {% for menu in menus %}
+  <li>{{menu}}</li>
+  {% endfor %}
+  <hr>
+  {% for menu in menus %}
+  <p>{{ forloop.counter }}: {{menu}}</p>
+  {% endfor %}
+  <hr>
+  {% for user in users %}
+  <p>{{user}}</p>
+  {% empty %}
+  <p>현재 가입한 유저가 없습니다!!</p>
+  {% endfor %}
+  <!-- 조건문 -->
+  <h2>2. 조건문</h2>
+  {% for menu in menus %}
+    {% if menu == '치킨' %}
+      <p>치킨은 푸라닭이지!!!</p>
+    {% endif %}
+  {% endfor %}
+  <!-- lorem -->
+  <h2>3. lorem</h2>
+  <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eius impedit consequatur commodi, saepe id enim veniam earum, eaque dolor a, architecto ipsam! Officiis natus voluptatum dolore suscipit praesentium impedit obcaecati.</p>
+  <p>{% lorem %}</p>
+  <!-- lorem 갯수 w/p
+  w : word
+  p : paragraph
+  -->
+  <p>{% lorem 3 w %}</p>
+  <p>{% lorem 1 p %}</p>
+  <p>{% lorem 2 w random %}</p>
+  <h2>4. 글자 관련 필터</h2>
+  <p>{{ sentence|truncatewords:3}}</p>
+  <p>{{sentence|truncatechars:10}}</p>
+  <p>{{ sentence|length }}</p>
+  <p>{{ sentence|lower }}</p>
+  <p>{{ sentence|title }}</p>
+  <p>{{ menus|random }}</p>
+  <h2>5. 날짜 표현</h2>
+  <p>{{ datetime_now }}</p>
+  <p>{% now 'DATE_FORMAT' %}</p>
+  <p>{% now 'DATETIME_FORMAT' %}</p>
+  <p>{% now 'SHORT_DATETIME_FORMAT' %}</p>
+  <p>{% now 'Y년 m월!' %}</p>
+  <p>{{ datetime_now|date:'SHORT_DATE_FORMAT' }}</p>
+  <p>{{ google_link|urlize }}</p>
 ```
 

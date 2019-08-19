@@ -19,6 +19,7 @@ from django.urls import path
 # 1. url 설정
 # pages app의 views.py 파일 불러오기
 from pages import views
+from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     # 1. url 설정
@@ -30,5 +31,6 @@ urlpatterns = [
     path('lotto/', views.lotto),  
     path('dinner/', views.dinner), 
     path('cube/<int:num>/', views.cube),
-    path('about/<str:name>/<int:age>/', views.about)
+    path('about/<str:name>/<int:age>/', views.about),
+    path('w14/', include('w14.urls'))
 ]
